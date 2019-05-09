@@ -24,3 +24,6 @@ export const getUserList=params=>{
 export const changeUserState=params=>{
     return axios.put(`users/${params.uId}/state/${params.type}`).then(res=>res.data)
 }
+export const addUserSubmit=params=>{
+    return axios.post('users',params).then(res=>res.data)
+}
