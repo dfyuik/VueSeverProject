@@ -24,7 +24,7 @@
         <el-table-column prop="mobile" label="电话"></el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-switch v-model="value2"></el-switch>
+            <el-switch v-model="scope.row.mg_state" @change="changeUserState(scope.row)"></el-switch>
           </template>
         </el-table-column>
         <el-table-column label="操作">
@@ -50,7 +50,7 @@
   </div>
 </template>
 <script>
-import { getUserList } from "@/api";
+import { getUserList, changeUserState } from "@/api";
 export default {
   data() {
     return {
@@ -84,6 +84,23 @@ export default {
           this.total=res.data.total;    
         }
       );
+    },
+    changeUserState(row){
+      console.log(row)
+      changeUserState({uId:row.id,type:row.mg_state}).then(res=>{
+        console.log(res)
+        if(res.meta.status==200){
+          this.$message({
+          message: '状态修改成功',
+          type: 'success'
+        })
+        }else{
+          this.$message({
+          message: res.meta.msg,
+          type: 'warning'
+        })
+        }
+      })
     }
   }
 };
