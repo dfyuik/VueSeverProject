@@ -22,7 +22,7 @@
         <el-button slot="append" icon="el-icon-search" @click="initList"></el-button>
       </el-input>
       <el-button type="success" plain @click="addDialogFormVisible=true">添加用户</el-button>
-      <el-table :data="userList" style="width: 100%" border>
+      <el-table :data="userList" style="width: 100%" border class="margin-20">
         <el-table-column type="index" width="50"></el-table-column>
         <el-table-column prop="username" label="姓名" width="180"></el-table-column>
         <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
@@ -355,6 +355,9 @@ export default {
 </script>
 <style lang="scss" scoped>
 .user {
+  .margin-20{
+    margin: 20px 0;
+  }
   .search-input {
     width: 300px;
   }
