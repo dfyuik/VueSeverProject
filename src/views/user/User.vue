@@ -41,7 +41,13 @@
               plain
               @click="getUserById(scope.row)"
             ></el-button>
-            <el-button size="mini" class="el-icon-delete-solid" type="danger" plain></el-button>
+            <el-button
+              size="mini"
+              class="el-icon-delete-solid"
+              type="danger"
+              plain
+              @click="deleteUser(scope.row)"
+            ></el-button>
             <el-button size="mini" class="el-icon-check" type="warning" plain></el-button>
           </template>
         </el-table-column>
@@ -105,7 +111,8 @@ import {
   changeUserState,
   addUserSubmit,
   getUserById,
-  editUser
+  editUser,
+  deleteUser
 } from "@/api";
 export default {
   data() {
@@ -243,6 +250,32 @@ export default {
       }),
         this.initList();
       this.editDialogFormVisible = false;
+    },
+    // 删除用户
+    deleteUser(row) {
+      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          deleteUser(row.id).then(res => {
+            console.log(res);
+            if ((res.meta.status = 200)) {
+              this.$message({
+                type: "success",
+                message: "删除成功!"
+              })
+            }
+            this.initList()
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     }
   }
 };
