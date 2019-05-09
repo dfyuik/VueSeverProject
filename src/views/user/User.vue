@@ -48,7 +48,13 @@
               plain
               @click="deleteUser(scope.row)"
             ></el-button>
-            <el-button size="mini" class="el-icon-check" type="warning" plain></el-button>
+            <el-button
+              size="mini"
+              class="el-icon-check"
+              type="warning"
+              plain
+              @click="showGrantDialog(scope.row)"
+            ></el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -102,6 +108,28 @@
           <el-button type="primary" @click="editUser('editForm')">确 定</el-button>
         </div>
       </el-dialog>
+      <!-- 分配角色 -->
+      <el-dialog title="分配角色" :visible.sync="grantDialogFormVisible">
+        <el-form :model="grantForm" label-width="120px">
+          <el-form-item label="当前的用户" prop="username">
+            <el-tag type="info">{{grantForm.username}}</el-tag>
+          </el-form-item>
+          <el-form-item label="请选择角色:">
+            <el-select v-model="roleId" placeholder="请选择角色">
+              <el-option
+                v-for="(role,index) in grantRolesList"
+                :key="index"
+                :label="role.roleName"
+                :value="role.id"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="editDialogFormVisible = false">取 消</el-button>
+          <el-button type="primary" @click="grantUserSubmit()">确 定</el-button>
+        </div>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -112,7 +140,9 @@ import {
   addUserSubmit,
   getUserById,
   editUser,
-  deleteUser
+  deleteUser,
+  getRolesList,
+  grantUserRole
 } from "@/api";
 export default {
   data() {
@@ -123,6 +153,7 @@ export default {
       total: 0,
       pagesize: 10,
       currentPage: 1,
+      roleId: "",
       addDialogFormVisible: false,
       addForm: {
         username: "",
@@ -136,6 +167,12 @@ export default {
         email: "",
         mobile: "",
         id: ""
+      },
+      grantDialogFormVisible: false,
+      grantRolesList: [],
+      grantForm: {
+        userName: "",
+        region: ""
       },
       rules: {
         username: [
@@ -265,9 +302,9 @@ export default {
               this.$message({
                 type: "success",
                 message: "删除成功!"
-              })
+              });
             }
-            this.initList()
+            this.initList();
           });
         })
         .catch(() => {
@@ -276,6 +313,42 @@ export default {
             message: "已取消删除"
           });
         });
+    },
+    // 显示角色分配框
+    showGrantDialog(row) {
+      this.grantDialogFormVisible = true;
+      this.grantForm = row;
+      getRolesList().then(res => {
+        if (res.meta.status == 200) {
+          this.grantRolesList = res.data;
+        }
+      });
+    },
+    //  分配角色
+    grantUserSubmit() {
+      if (!this.roleId) {
+        this.$message({
+              message:'请选择角色，不能为空',
+              type: "warning"
+            })
+      } else {
+        grantUserRole({ id: this.grantForm.id, rid: this.roleId }).then(res => {
+          if (res.meta.status == 200) {
+            this.$message({
+              message: "分配角色成功",
+              type: "success"
+            });
+          } else {
+            this.$message({
+              message: res.meta.msg,
+              type: "warning"
+            });
+          }
+        });
+      }
+
+      this.grantDialogFormVisible = false;
+      this.initList();
     }
   }
 };
